@@ -9,16 +9,18 @@ def main():
     while True:
         # fetch all my positions
         positions = fetch_position(my_positions)
+        reports = ["Report ~~~\n"]
         for position in positions:
-            # report every 24 hr
+            # create reports every 24 hr
             if counter == 0:
                 msg = (
-                    "Report ~~~\n"
-                    + f'pos: {position["id"]}\n'
+                    f'pos: {position["id"]}\n'
                     + f'trading fee: {(position["apy"])}\n'
-                    + f'debt: {position["debtRatio"]}'
+                    + f'debt: {position["debtRatio"]}\n'
+                    + "x" * 30
+                    + "\n"
                 )
-                send_alert(msg)
+                reports.append(msg)
             # apy too small ?
             if position["apy"] - HARDCODED_BORROW_APY <= MIN_APY:
                 msg = (
@@ -35,6 +37,10 @@ def main():
                     + f'debt: {position["debtRatio"]}'
                 )
                 send_alert(msg)
+        # send reports
+        if counter == 0:
+            send_alert("".join(reports))
+
         time.sleep(300)
         # update counter for daily report
         counter = (counter + 1) % 288
